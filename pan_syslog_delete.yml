@@ -1,0 +1,39 @@
+---
+- name: PAN-OS Syslog Delete
+  hosts: PA
+  connection: local
+  gather_facts: false
+  vars_prompt:
+
+    - name: ip
+      prompt: "Enter the firewall Mgmt Address or hostname?"
+      private: no
+
+    - name: username
+      prompt: "Enter the username"
+      private: no
+
+    - name: password
+      prompt: "Enter the password"
+
+    - name: profile_input
+      prompt: "Enter the Profile name"
+      private: no
+
+      
+
+  tasks:
+
+     - name: Deleting Syslog Server Profile
+       panos_set:
+         command: delete 
+         ip_address: "{{ ip | ipaddr }}"
+         username: "{{ username }}"
+         password: "{{ password }}"
+         xpath:    "/config/shared/log-settings/syslog/entry[@name='{{profile_input}}']"
+                
+     - name: Commit configuration
+       panos_commit:
+         ip_address: "{{ ip }}"
+         username: "{{ username }}"
+         password: "{{ password }}"
