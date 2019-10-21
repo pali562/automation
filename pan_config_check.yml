@@ -1,0 +1,46 @@
+---
+- name: To check config if there any pending changes
+  hosts: PA
+  connection: local
+  gather_facts: false
+  vars_prompt:
+
+    - name: ip
+      prompt: "Enter the firewall Mgmt Address or hostname?"
+      private: no
+
+    - name: username
+      prompt: "Enter the username"
+      private: no
+
+    - name: password
+      prompt: "Enter the password"
+
+         
+
+  tasks:
+
+     - name: Checking the config 
+       panos_op:
+         ip_address: "{{ ip | ipaddr }}"
+         username: "{{ username }}"
+         password: "{{ password }}"
+         cmd:    'check pending-changes'
+       register: result
+        
+     - debug:
+          msg: "{{ (result.stdout | from_json)['response']['result'] }}"
+
+       
+     - name: Commit configuration
+       
+       panos_commit:
+         ip_address: "{{ ip }}"
+         username: "{{ username }}"
+         password: "{{ password }}" 
+
+       when: (result == "yes" )
+
+       
+
+            
